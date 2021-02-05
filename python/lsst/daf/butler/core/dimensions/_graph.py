@@ -21,8 +21,9 @@
 
 from __future__ import annotations
 
-__all__ = ["DimensionGraph"]
+__all__ = ["DimensionGraph", "SerializedDimensionGraph"]
 
+from pydantic import BaseModel
 import itertools
 from types import MappingProxyType
 from typing import (
@@ -43,13 +44,17 @@ from typing import (
 from ..named import NamedValueAbstractSet, NamedValueSet
 from ..utils import cached_getter, immutable
 from .._topology import TopologicalSpace, TopologicalFamily
-from ..json import from_json_generic, to_json_generic
+from ..json import from_json_pydantic, to_json_pydantic
 
 if TYPE_CHECKING:  # Imports needed only for type annotations; may be circular.
     from ._universe import DimensionUniverse
     from ._elements import DimensionElement, Dimension
     from ._governor import GovernorDimension
     from ...registry import Registry
+
+
+class SerializedDimensionGraph(BaseModel):
+    names: List[str]
 
 
 @immutable
@@ -94,6 +99,8 @@ class DimensionGraph:
     `DimensionUniverse`), or complete `~collection.abc.Set` semantics are
     required.
     """
+    _serializedType = SerializedDimensionGraph
+
     def __new__(
         cls,
         universe: DimensionUniverse,
@@ -189,7 +196,7 @@ class DimensionGraph:
         """
         return self.dimensions.names
 
-    def to_simple(self, minimal: bool = False) -> List[str]:
+    def to_simple(self, minimal: bool = False) -> SerializedDimensionGraph:
         """Convert this class to a simple python type suitable for
         serialization.
 
@@ -204,10 +211,10 @@ class DimensionGraph:
             The names of the dimensions.
         """
         # Names are all we can serialize.
-        return list(self.names)
+        return SerializedDimensionGraph(names=list(self.names))
 
     @classmethod
-    def from_simple(cls, names: List[str],
+    def from_simple(cls, names: SerializedDimensionGraph,
                     universe: Optional[DimensionUniverse] = None,
                     registry: Optional[Registry] = None) -> DimensionGraph:
         """Construct a new object from the data returned from the `to_simple`
@@ -237,10 +244,10 @@ class DimensionGraph:
             # this is for mypy
             raise ValueError("Unable to determine a usable universe")
 
-        return cls(names=names, universe=universe)
+        return cls(names=names.names, universe=universe)
 
-    to_json = to_json_generic
-    from_json = classmethod(from_json_generic)
+    to_json = to_json_pydantic
+    from_json = classmethod(from_json_pydantic)
 
     def __iter__(self) -> Iterator[Dimension]:
         """Iterate over all dimensions in the graph (and true `Dimension`
