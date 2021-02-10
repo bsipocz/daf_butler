@@ -107,6 +107,10 @@ storageClasses:
     pytype: lsst.ip.isr.CrosstalkCalib
   PhotonTransferCurveDataset:
     pytype: lsst.ip.isr.PhotonTransferCurveDataset
+  StrayLightData:
+    pytype: lsst.ip.isr.StrayLightData
+  BrighterFatterKernel:
+    pytype: lsst.ip.isr.BrighterFatterKernel
   # TODO: remove Filter in DM-27177
   Filter:
     pytype: lsst.afw.image.Filter
@@ -172,10 +176,6 @@ storageClasses:
     pytype: lsst.base.Packages
   NumpyArray:
     pytype: numpy.ndarray
-  StrayLightData:
-    pytype: lsst.ip.isr.StrayLightData
-  BrighterFatterKernel:
-    pytype: lsst.cp.pipe.makeBrighterFatterKernel.BrighterFatterKernel
   Thumbnail:
     pytype: numpy.ndarray
   Plot:
