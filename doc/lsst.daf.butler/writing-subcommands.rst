@@ -1,5 +1,10 @@
 .. _daf_butler_cli:
 
+.. note::
+
+    This page describes how to extend the ``butler`` subcommand; see :ref:`lsst.daf.butler-scripts` for documentation on the subcommands defined in `lsst.daf.butler`.
+    Additional subcommands are defined in other packages, especially `lsst.obs.base`.
+
 The Butler Command
 ==================
 
