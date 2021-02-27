@@ -65,6 +65,7 @@ from lsst.daf.butler import (
     FormatterFactory,
     Location,
     LocationFactory,
+    Progress,
     StorageClass,
     StoredFileInfo,
 )
@@ -882,7 +883,8 @@ class FileDatastore(GenericBaseDatastore):
     def _finishIngest(self, prepData: Datastore.IngestPrepData, *, transfer: Optional[str] = None) -> None:
         # Docstring inherited from Datastore._finishIngest.
         refsAndInfos = []
-        for dataset in prepData.datasets:
+        progress = Progress("daf.butler.datastores.FileDatastore.ingest")
+        for dataset in progress.wrap(prepData.datasets, desc="Ingesting dataset files"):
             # Do ingest as if the first dataset ref is associated with the file
             info = self._extractIngestInfo(dataset.path, dataset.refs[0], formatter=dataset.formatter,
                                            transfer=transfer)
@@ -1653,7 +1655,8 @@ class FileDatastore(GenericBaseDatastore):
             if not directoryUri.exists():
                 raise FileNotFoundError(f"Export location {directory} does not exist")
 
-        for ref in refs:
+        progress = Progress("daf.butler.datastores.FileDatastore.export")
+        for ref in progress.wrap(refs, "Exporting dataset files"):
             fileLocations = self._get_dataset_locations_info(ref)
             if not fileLocations:
                 raise FileNotFoundError(f"Could not retrieve dataset {ref}.")
