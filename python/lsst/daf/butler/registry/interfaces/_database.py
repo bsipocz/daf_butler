@@ -1144,7 +1144,10 @@ class Database(ABC):
                 n, bad, result = check()
                 if n < 1:
                     raise RuntimeError(
-                        "Necessary insertion in sync did not seem to affect table.  This is a bug."
+                        f"Attempted to ensure {row} exists by inserting it with ON CONFLICT IGNORE, "
+                        f"but a post-insert query on {keys} returned no results. "
+                        f"Insert was {'' if inserted else 'not '} reported as successful. "
+                        "Please report this as a bug."
                     )
                 elif n > 1:
                     raise RuntimeError(f"Keys passed to sync {keys.keys()} do not comprise a "
